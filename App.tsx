@@ -288,7 +288,7 @@ export default function App() {
     }
   }, [view, loadMore]);
 
-  const handleExhibitClick = async (item: Exhibit) => {
+  const handleExhibitClick = (item: Exhibit) => {
     const sessionKey = `neo_viewed_${item.id}`;
     const hasViewed = sessionStorage.getItem(sessionKey);
     let updatedItem = item;
@@ -296,7 +296,8 @@ export default function App() {
         updatedItem = { ...item, views: (item.views || 0) + 1 };
         setExhibits(prev => prev.map(e => e.id === item.id ? updatedItem : e));
         sessionStorage.setItem(sessionKey, 'true');
-        await db.updateExhibit(updatedItem);
+        // PERFORMANCE: Update in background, don't block navigation
+        db.updateExhibit(updatedItem).catch(err => console.warn('Failed to update view count:', err));
     }
     navigateTo('EXHIBIT', { item: updatedItem });
   };
