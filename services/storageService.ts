@@ -272,7 +272,7 @@ export const startLiveUpdates = () => {
         } catch (e) {
             console.warn("[LiveSync] Pulse skipped (Network issue?)");
         }
-    }, 8000); 
+    }, 20000); // PERFORMANCE: Increased from 8s to 20s to reduce server load 
 };
 
 export const stopLiveUpdates = () => {
@@ -366,7 +366,9 @@ export const initializeDatabase = async (): Promise<UserProfile | null> => {
 };
 
 export const forceSync = performCloudSync;
-export const getFullDatabase = () => ({ ...cache });
+// PERFORMANCE: Return cache directly instead of shallow copy
+// This is safe because external code only reads, never mutates directly
+export const getFullDatabase = () => cache;
 
 const checkAndAddHelloAchievement = async (user: UserProfile) => {
     if (!user.achievements) user.achievements = [];
